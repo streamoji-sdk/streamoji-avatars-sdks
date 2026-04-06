@@ -5,7 +5,7 @@ import { AvatarCreatorEvent } from '../events';
 import { useAvatarCreatorUrl } from '../hooks/use-avatar-creator-url';
 
 const MESSAGE_EVENT = 'message';
-const RPM_TARGET = 'readyplayerme';
+const STREAMOJI_TARGET = 'streamojiavatars';
 const IFRAME_READY_EVENT = 'v1.frame.ready';
 
 export type AvatarCreatorRawProps = {
@@ -20,8 +20,8 @@ export type EventReceivedProps = {
 };
 
 /**
- * AvatarCreatorRaw is a React component that allows you to create an avatar using Ready Player Me and receive avatar URL. It exposes the raw events in one callback to allow you to write more custom logic around the event handling.
- * @param subdomain The subdomain of your Ready Player Me instance.
+ * AvatarCreatorRaw is a React component that allows you to create an avatar using Streamoji Avatars and receive avatar URL. It exposes the raw events in one callback to allow you to write more custom logic around the event handling.
+ * @param subdomain Your Streamoji Avatars tenant or dashboard subdomain.
  * @param className The css classes to apply to this iframe.
  * @param style The css styles to apply to this iframe.
  * @param avatarCreatorConfig The configuration for the AvatarCreator component.
@@ -37,7 +37,7 @@ export const AvatarCreatorRaw: FC<AvatarCreatorRawProps & EventReceivedProps> = 
 
     frameRef.current?.contentWindow?.postMessage(
       JSON.stringify({
-        target: RPM_TARGET,
+        target: STREAMOJI_TARGET,
         type: 'subscribe',
         eventName: 'v1.**',
       }),
@@ -48,7 +48,7 @@ export const AvatarCreatorRaw: FC<AvatarCreatorRawProps & EventReceivedProps> = 
   const subscribe = (event: MessageEvent) => {
     const avatarCreatorEvent = JSONTryParse<AvatarCreatorEvent>(event.data);
 
-    if (avatarCreatorEvent?.source !== RPM_TARGET) return;
+    if (avatarCreatorEvent?.source !== STREAMOJI_TARGET) return;
 
     if (avatarCreatorEvent?.eventName === IFRAME_READY_EVENT) {
       subscribeToAvatarCreatorEvents();
@@ -66,5 +66,5 @@ export const AvatarCreatorRaw: FC<AvatarCreatorRawProps & EventReceivedProps> = 
     };
   }, []);
 
-  return <iframe title="Ready Player Me" ref={frameRef} src={url} style={style} className={className} allow="camera *; clipboard-write" />;
+  return <iframe title="Streamoji Avatars" ref={frameRef} src={url} style={style} className={className} allow="camera *; clipboard-write" />;
 };
