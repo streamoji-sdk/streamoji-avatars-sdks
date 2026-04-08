@@ -10,15 +10,15 @@ export type AvatarCreatorProps = {
 } & AvatarCreatorRawProps;
 
 /**
- * AvatarCreator is a React component that allows you to create an avatar using Ready Player Me and receive avatar URL. It wraps AvatarCreatorRaw to provide more type safety, and to provide explicit callbacks per event type.
- * @param subdomain The subdomain of your Ready Player Me instance.
+ * AvatarCreator is a React component that allows you to create an avatar using Streamoji Avatars and receive avatar URL. It wraps AvatarCreatorRaw to provide more type safety, and to provide explicit callbacks per event type.
+ * @param subdomain Your Streamoji Avatars tenant or dashboard subdomain.
  * @param className The css classes to apply to this iframe.
  * @param style The css styles to apply to this iframe.
  * @param config The configuration for the AvatarCreator component.
  * @param onUserSet A callback that is called when a user is set.
  * @param onAvatarExported A callback that is called when an avatar is exported.
  * @param onUserAuthorized A callback that is called when a user is authorized.
- * @param onAssetUnlock A callback that is called when an asset unlock button is pressed in RPM.
+ * @param onAssetUnlock A callback that is called when an asset unlock button is pressed.
  * @returns A React component.
  */
 export const AvatarCreator: FC<AvatarCreatorProps> = ({ subdomain, className, style, config, onUserSet, onAvatarExported, onUserAuthorized, onAssetUnlock }) => {

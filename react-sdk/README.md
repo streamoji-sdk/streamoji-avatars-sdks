@@ -1,30 +1,24 @@
-# Ready Player Me - React Avatar Creator
+# Streamoji - React Avatar Creator
 
-**Ready Player Me - React Avatar Creator** is a set of components and helper methods to help implementing the Ready Player Me Avatar Creator into React projects.
-
-Codesandbox example for loading the Avatar Creator: https://codesandbox.io/p/sandbox/ready-player-me-react-avatar-creator-qxkqjf
-
-Codesandbox example for loading the Avatar Creator and visualizing the avatar with the Visage package: https://codesandbox.io/p/sandbox/ready-player-me-visage-example-l4m2k2
+**Streamoji - React Avatar Creator** is a set of components and helper methods to implement the Streamoji Avatar Creator into React projects.
 
 ## Installation
 
-Ready Player Me React Avatar Creator is available as a [npm package](https://www.npmjs.com/package/@readyplayerme/react-avatar-creator).
+Streamoji React Avatar Creator is available as an npm package.
 
 ```bash
-npm i @readyplayerme/react-avatar-creator
+npm i @streamoji/react-avatar-creator
 ```
 
 ## Usage
 
 ```tsx
-import { AvatarCreator } from '@readyplayerme/react-avatar-creator';
+import { AvatarCreator } from '@streamoji/react-avatar-creator';
 
 export default function App() {
-  return <AvatarCreator subdomain="demo" style={{ width: '100%', height: '100vh', border: 'none' }} />;
+  return <AvatarCreator style={{ width: '100%', height: '100vh', border: 'none' }} />;
 }
 ```
-
-https://user-images.githubusercontent.com/3163281/235168912-a9dacd91-af3a-4b35-81c3-b025e12e333a.mp4
 
 ---
 
@@ -32,68 +26,78 @@ https://user-images.githubusercontent.com/3163281/235168912-a9dacd91-af3a-4b35-8
 
 ## AvatarCreator
 
-AvatarCreator component helps you load Ready Player Me in an iframe where you can edit your avatar and receive your avatar URL as a post message once your avatar is exported.
+`AvatarCreator` component helps you load the Streamoji Avatars editor in an iframe where users can customize their avatar securely and you receive their exported avatar URL upon completion.
 
 ### Parameters
 
-**subdomain** _[required]_: string
-
-- Your Ready Player Me subdomain. You can get one from [Ready Player Me Studio](https://studio.readyplayer.me/).
+**subdomain** _[optional]_: string
+- Tenant subdomain parameter. Not strictly required for standard endpoint.
 
 **className** _[optional]_: string
-
 - The css classes to apply to the iframe.
 
 **style** _[optional]_: CSSProperties
-
 - The css styles to apply to the iframe.
 
 **config** _[optional]_: AvatarCreatorConfig
-
-- Editor Configuration is where you can set url properties of Ready Player Me editor. Read more about these options in [Ready Player Me documentations](https://docs.readyplayer.me/ready-player-me/integration-guides/web-and-native-integration/avatar-creator-integration#configuration-1).
+- Editor Configuration where you can set URL properties of the Streamoji editor. Available settings:
+  - `bodyType`: `'Half' | 'Full'` restricts the builder to a specific body type.
+  - `language`: string for localization.
+  - `token`: string representing the external Auth Token parameter.
+  - `avatarId`: string to edit an existing avatar item.
+  - `userId`: string useful for managing specific saved avatars.
+  - `genderSelection`: boolean forces the gender selection screen to appear on load.
+  - `saveConfirm`: boolean shows a confirmation modal before finalizing the export.
+  - `whiteLabelTitle`: string customizes the title displayed inside the editor.
+  - `whiteLabelColor`: string applies a custom theme color (Hex format, e.g. '#BB86FC').
+  - `thumbnail`: boolean if set to true, includes `thumbnailUrl` in the export event payload.
+  - `downloadUrl`: boolean if true, provides users a direct download prompt.
+  - `hidePremiumAssets`: boolean hides premium paid assets from the picker UI.
 
 **onAvatarExported** _[optional]_: (event: AvatarExportedEvent) => void
-
-- Callback function that is called when avatar is exported.
+- Callback function triggered when avatar is successfully exported.
 
 **onUserSet** _[optional]_: (event: UserSetEvent) => void
+- Callback function triggered when the user context initializes.
 
-- Callback function that is called when user id is set.
-
-**onAssetUnlocked** _[optional]_: (event: AssetUnlockedEvent) => void
-
-- Callback function that is called when an asset is unlocked.
-
-**onUserAuthorized** _[optional]_: (event: UserAuthorizedEvent) => void
-
-- Callback function that is called when the user is authorized.
+**onAssetUnlock** _[optional]_: (event: AssetUnlockedEvent) => void
+- Callback function when a locked asset is acquired.
 
 ### Example
 
 ```tsx
-import { AvatarCreator, AvatarCreatorConfig, AvatarExportedEvent, UserSetEvent } from '@readyplayerme/react-avatar-creator';
+import { AvatarCreator, AvatarCreatorConfig, AvatarExportedEvent, UserSetEvent } from '@streamoji/react-avatar-creator';
 
 const config: AvatarCreatorConfig = {
-  clearCache: true,
-  bodyType: 'fullbody',
-  quickStart: false,
-  language: 'en',
+  bodyType: 'Full',
+  thumbnail: true,
+  saveConfirm: true,
+  whiteLabelTitle: 'My Custom App',
+  whiteLabelColor: '#BB86FC',
 };
 
 const style = { width: '100%', height: '100vh', border: 'none' };
 
 export default function App() {
   const handleOnUserSet = (event: UserSetEvent) => {
-    console.log(`User ID is: ${event.data.id}`);
+    console.log(`User initialized ID is: ${event.data.id}`);
   };
 
   const handleOnAvatarExported = (event: AvatarExportedEvent) => {
-    console.log(`Avatar URL is: ${event.data.url}`);
+    console.log(`Avatar successfully compiled! URL: ${event.data.url}`);
+    if (event.data.thumbnailUrl) {
+      console.log(`Thumbnail preview: ${event.data.thumbnailUrl}`);
+    }
   };
 
   return (
     <>
-      <AvatarCreator subdomain="demo" config={config} style={style} onUserSet={handleOnUserSet} onAvatarExported={handleOnAvatarExported} />
+      <AvatarCreator 
+        config={config} 
+        style={style} 
+        onUserSet={handleOnUserSet} 
+        onAvatarExported={handleOnAvatarExported} 
+      />
     </>
   );
 }
@@ -101,83 +105,42 @@ export default function App() {
 
 ## AvatarCreatorRaw
 
-AvatarCreatorRaw is a lower level component that gives you everything found in the avatar creator, but without explicit callbacks for each event, so you can have the ability to create your own custom logic around these events, if you choose to do so.
+`AvatarCreatorRaw` is a lower-level component that establishes the iframe and message-bus connections without abstracting away explicit event callbacks. You receive all broadcast messages emitted by Streamoji via a single hook. 
 
 ### Parameters
 
-**subdomain** _[required]_: string
-
-- Your Ready Player Me subdomain. You can get one from [Ready Player Me Studio](https://studio.readyplayer.me/).
-
-**className** _[optional]_: string
-
-- The css classes to apply to the iframe.
-
-**style** _[optional]_: CSSProperties
-
-- The css styles to apply to the iframe.
-
-**config** _[optional]_: AvatarCreatorConfig
-
-- Editor Configuration is where you can set url properties of Ready Player Me editor. Read more about these options in [Ready Player Me documentations](https://docs.readyplayer.me/ready-player-me/integration-guides/web-and-native-integration/avatar-creator-integration#configuration-1).
+All parameters from `AvatarCreator` exist here, replacing explicit interaction callbacks with `onEventReceived`:
 
 **onEventReceived** _[required]_: (event: IFrameEvent<any>) => void
-
-- Callback function that is called whenever an AvatarCreatorEvent is published
+- Standard callback that intercepts any `v1.**` namespace events published inside the Avatar Creator.
 
 ### Example
 
 ```tsx
-import { AvatarCreatorConfig, AvatarCreatorEvent, AvatarCreatorRaw } from '@readyplayerme/react-avatar-creator';
+import { AvatarCreatorConfig, AvatarCreatorEvent, AvatarCreatorRaw } from '@streamoji/react-avatar-creator';
 
 const config: AvatarCreatorConfig = {
-  clearCache: true,
-  bodyType: 'fullbody',
-  quickStart: false,
-  language: 'en',
+  bodyType: 'Half',
+  saveConfirm: true,
+  whiteLabelTitle: 'Streamoji SDK',
+  whiteLabelColor: '#3B82F6'
 };
 
 const style = { width: '100%', height: '100vh', border: 'none' };
 
 export default function App() {
   const handleCustomEvent = (event: AvatarCreatorEvent) => {
-    console.log(`Received custom event`, event);
+    console.log(`Received raw Custom Event structure:`, event);
   };
 
   return (
     <>
-      <AvatarCreatorRaw subdomain="demo" config={config} style={style} onEventReceived={handleCustomEvent} />
+      <AvatarCreatorRaw 
+         config={config} 
+         style={style} 
+         onEventReceived={handleCustomEvent} 
+      />
     </>
   );
 }
-```
-
-## Using AvatarCreator with Visage
-
-If you would like to use Visage, with its full capability to edit camera and light properties of the scene and more, you can use AvatarCreator component and Visage components together.
-
-```tsx
-import { Avatar } from '@readyplayerme/visage';
-import { AvatarCreator, AvatarCreatorConfig } from '@readyplayerme/react-avatar-creator';
-import { useState } from 'react';
-
-const subdomain = 'demo';
-
-const config: AvatarCreatorConfig = {
-  clearCache: true,
-  bodyType: 'fullbody',
-  quickStart: false,
-  language: 'en',
-};
-
-const style = { width: '100%', height: '100vh', border: 'none' };
-
-export const YourCustomComponent = () => {
-  const [url, setUrl] = useState<string>();
-
-  if (!url) {
-    return <AvatarCreator subdomain={subdomain} config={config} style={style} onAvatarExported={(event) => setUrl(event.data.url)} />;
-  }
-  return <Avatar style={style} modelSrc={url} cameraInitialDistance={10} />;
-};
 ```
