@@ -1,9 +1,5 @@
-import { IFrameEvent } from '../types';
+import { AvatarExportedData, StreamojiEvent } from '../types';
 
-export type AvatarExportedEventPayload = {
-  url: string;
-  userId: string;
-  avatarId: string;
-};
+export type AvatarExportedEventPayload = AvatarExportedData;
 
-export type AvatarExportedEvent = IFrameEvent<AvatarExportedEventPayload>;
+export type AvatarExportedEvent = StreamojiEvent<AvatarExportedEventPayload>;

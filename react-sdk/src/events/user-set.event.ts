@@ -1,7 +1,7 @@
-import { IFrameEvent } from '../types';
+import { StreamojiEvent } from '../types';
 
 export type UserSetEventPayload = {
   id: string;
 };
 
-export type UserSetEvent = IFrameEvent<UserSetEventPayload>;
+export type UserSetEvent = StreamojiEvent<UserSetEventPayload>;

@@ -1,8 +1,8 @@
-import { IFrameEvent } from '../types';
+import { StreamojiEvent } from '../types';
 
 export type AssetUnlockedEventPayload = {
   userId: string;
   assetId: string;
 };
 
-export type AssetUnlockedEvent = IFrameEvent<AssetUnlockedEventPayload>;
+export type AssetUnlockedEvent = StreamojiEvent<AssetUnlockedEventPayload>;
