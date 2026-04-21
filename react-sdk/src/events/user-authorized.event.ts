@@ -1,7 +1,7 @@
-import { IFrameEvent } from '../types';
+import { StreamojiEvent } from '../types';
 
 export type UserAuthorizedEventPayload = {
   url: string;
 };
 
-export type UserAuthorizedEvent = IFrameEvent<UserAuthorizedEventPayload>;
+export type UserAuthorizedEvent = StreamojiEvent<UserAuthorizedEventPayload>;

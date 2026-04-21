@@ -1,3 +1,13 @@
 export { AvatarCreator, AvatarCreatorRaw } from './components';
-export type { AvatarCreatorConfig, Language, BodyType, IFrameEvent } from './types';
+export { fetchStreamojiToken } from './utils';
+export type {
+  AvatarCreatorConfig,
+  AvatarCreatorProps,
+  AvatarExportedData,
+  BodyType,
+  FetchStreamojiTokenParams,
+  FetchStreamojiTokenResponse,
+  IFrameEvent,
+  StreamojiEvent,
+} from './types';
 export type * from './events';

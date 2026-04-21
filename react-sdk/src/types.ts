@@ -1,24 +1,50 @@
-export type BodyType = 'Half' | 'Full';
+import { CSSProperties } from 'react';
 
-export type Language = 'en' | 'en-IE' | 'de' | 'fr' | 'es' | 'es-MX' | 'it' | 'pt' | 'pt-BR' | 'tr' | 'ja' | 'kr' | 'ch';
+export type BodyType = 'Half' | 'Full';
 
 export type AvatarCreatorConfig = {
   bodyType?: BodyType;
-  language?: Language;
-  token?: string;
-  avatarId?: string;
-  userId?: string;
-  genderSelection?: boolean;
-  saveConfirm?: boolean;
   whiteLabelTitle?: string;
   whiteLabelColor?: string;
+  saveConfirm?: boolean;
   thumbnail?: boolean;
-  downloadUrl?: boolean;
-  hidePremiumAssets?: boolean;
 };
 
-export type IFrameEvent<TPayload> = {
+export type AvatarExportedData = {
+  url: string;
+  avatarId: string;
+  userId?: string;
+  thumbnailUrl?: string;
+  avatarGender?: string;
+  [key: string]: unknown;
+};
+
+export type StreamojiEvent<TPayload = unknown> = {
   eventName?: string;
   source?: string;
-  data: TPayload;
+  data?: TPayload;
+};
+
+export type IFrameEvent<TPayload = unknown> = StreamojiEvent<TPayload>;
+
+export type AvatarCreatorProps = {
+  token: string;
+  onAvatarExported?: (data: AvatarExportedData) => void;
+  onReady?: () => void;
+  config?: AvatarCreatorConfig;
+  style?: CSSProperties;
+  className?: string;
+};
+
+export type FetchStreamojiTokenParams = {
+  clientId: string;
+  clientSecret: string;
+  userId: string;
+  userName: string;
+};
+
+export type FetchStreamojiTokenResponse = {
+  success?: boolean;
+  authToken?: string;
+  [key: string]: unknown;
 };

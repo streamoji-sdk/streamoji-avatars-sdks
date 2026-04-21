@@ -1,37 +1,54 @@
-import React, { FC } from 'react';
-import { AvatarCreatorEvent, UserAuthorizedEvent, AssetUnlockedEvent, AvatarExportedEvent, UserSetEvent } from '../events';
-import { AvatarCreatorRaw, AvatarCreatorRawProps } from './avatar-creator-raw';
+import React, { FC, useCallback, useEffect, useRef } from 'react';
+import { AvatarExportedEvent } from '../events';
+import { AvatarCreatorProps, IFrameEvent } from '../types';
+import { useAvatarCreatorUrl } from '../hooks/use-avatar-creator-url';
+import { JSONTryParse } from '../utils';
 
-export type AvatarCreatorProps = {
-  onUserSet?: (event: UserSetEvent) => void;
-  onAvatarExported?: (event: AvatarExportedEvent) => void;
-  onUserAuthorized?: (event: UserAuthorizedEvent) => void;
-  onAssetUnlock?: (event: AssetUnlockedEvent) => void;
-} & AvatarCreatorRawProps;
+const STREAMOJI_TARGET = 'streamojiavatars';
+const FRAME_READY_EVENT = 'v1.frame.ready';
+const AVATAR_EXPORTED_EVENT = 'v1.avatar.exported';
 
-/**
- * AvatarCreator is a React component that allows you to create an avatar using Streamoji Avatars and receive avatar URL. It wraps AvatarCreatorRaw to provide more type safety, and to provide explicit callbacks per event type.
- * @param subdomain Your Streamoji Avatars tenant or dashboard subdomain.
- * @param className The css classes to apply to this iframe.
- * @param style The css styles to apply to this iframe.
- * @param config The configuration for the AvatarCreator component.
- * @param onUserSet A callback that is called when a user is set.
- * @param onAvatarExported A callback that is called when an avatar is exported.
- * @param onUserAuthorized A callback that is called when a user is authorized.
- * @param onAssetUnlock A callback that is called when an asset unlock button is pressed.
- * @returns A React component.
- */
-export const AvatarCreator: FC<AvatarCreatorProps> = ({ subdomain, className, style, config, onUserSet, onAvatarExported, onUserAuthorized, onAssetUnlock }) => {
-  const supportedEvents = {
-    'v1.avatar.exported': onAvatarExported,
-    'v1.user.set': onUserSet,
-    'v1.user.authorized': onUserAuthorized,
-    'v1.asset.unlock': onAssetUnlock,
-  } as Record<string, any>;
+export const AvatarCreator: FC<AvatarCreatorProps> = ({ token, onAvatarExported, onReady, config, style, className }) => {
+  const frameRef = useRef<HTMLIFrameElement | null>(null);
+  const src = useAvatarCreatorUrl(token, config);
 
-  const handleEvents = (event: AvatarCreatorEvent) => {
-    supportedEvents[event.eventName!]?.(event);
-  };
+  const subscribeToEvents = useCallback(() => {
+    frameRef.current?.contentWindow?.postMessage(
+      JSON.stringify({
+        target: STREAMOJI_TARGET,
+        type: 'subscribe',
+        eventName: 'v1.**',
+      }),
+      '*'
+    );
+  }, []);
 
-  return <AvatarCreatorRaw subdomain={subdomain} className={className} style={style} config={config} onEventReceived={handleEvents} />;
+  const handleMessage = useCallback(
+    (event: MessageEvent) => {
+      const parsedMessage = JSONTryParse<IFrameEvent>(event.data);
+
+      if (parsedMessage?.source !== STREAMOJI_TARGET) return;
+
+      if (parsedMessage.eventName === FRAME_READY_EVENT) {
+        subscribeToEvents();
+        onReady?.();
+        return;
+      }
+
+      if (parsedMessage.eventName === AVATAR_EXPORTED_EVENT && parsedMessage.data) {
+        onAvatarExported?.((parsedMessage as AvatarExportedEvent).data!);
+      }
+    },
+    [onAvatarExported, onReady, subscribeToEvents]
+  );
+
+  useEffect(() => {
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [handleMessage]);
+
+  return <iframe ref={frameRef} title="Streamoji Avatar Creator" src={src} style={style} className={className} allow="camera *; microphone *; clipboard-write" />;
 };

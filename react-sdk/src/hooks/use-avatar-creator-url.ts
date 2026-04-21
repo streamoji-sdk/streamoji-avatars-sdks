@@ -1,23 +1,19 @@
-import { AvatarCreatorConfig } from '../types';
 import { useMemo } from 'react';
+import { AvatarCreatorConfig } from '../types';
 
-export const useAvatarCreatorUrl = (subdomain: string, config: AvatarCreatorConfig | undefined): string => {
+export const useAvatarCreatorUrl = (token: string, config?: AvatarCreatorConfig): string => {
   return useMemo(() => {
-    let url = `https://avatars.streamoji.com/createAvatar?iframe=true`;
+    const params = new URLSearchParams({
+      iframe: 'true',
+      token,
+    });
 
-    if (config?.bodyType) url += `&bodyType=${config?.bodyType}`;
-    if (config?.token) url += `&token=${config?.token}`;
-    if (config?.avatarId) url += `&avatarId=${config?.avatarId}`;
-    if (config?.userId) url += `&userId=${config?.userId}`;
-    if (config?.genderSelection) url += `&genderSelection=true`;
-    if (config?.saveConfirm) url += `&saveConfirm=true`;
-    if (config?.whiteLabelTitle) url += `&whiteLabelTitle=${encodeURIComponent(config.whiteLabelTitle)}`;
-    if (config?.whiteLabelColor) url += `&whiteLabelColor=${encodeURIComponent(config.whiteLabelColor.replace('#', ''))}`;
-    if (config?.thumbnail) url += `&thumbnail=true`;
-    if (config?.downloadUrl) url += `&downloadUrl=true`;
-    if (config?.hidePremiumAssets) url += `&hidePremiumAssets=true`;
-    if (config?.language) url += `&language=${config?.language}`;
+    if (config?.bodyType) params.set('bodyType', config.bodyType);
+    if (config?.whiteLabelTitle) params.set('whiteLabelTitle', config.whiteLabelTitle);
+    if (config?.whiteLabelColor) params.set('whiteLabelColor', config.whiteLabelColor.replace('#', ''));
+    if (config?.saveConfirm) params.set('saveConfirm', 'true');
+    if (config?.thumbnail) params.set('thumbnail', 'true');
 
-    return url;
-  }, [subdomain, config]);
+    return `https://avatars.streamoji.com/createAvatar/?${params.toString()}`;
+  }, [config, token]);
 };
