@@ -1,8 +1,26 @@
 import { useEffect, useState } from 'react';
 import { AvatarCreator, type AvatarExportedData } from '@streamoji/react-avatar-creator';
 
+// Extend JSX namespace for model-viewer
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'model-viewer': any;
+    }
+  }
+  namespace React {
+    namespace JSX {
+      interface IntrinsicElements {
+        'model-viewer': any;
+      }
+    }
+  }
+}
+
+
 function App() {
   const [token, setToken] = useState('');
+  const [exportedData, setExportedData] = useState<AvatarExportedData | null>(null);
 
   useEffect(() => {
     const demoToken = import.meta.env.VITE_STREAMOJI_AUTH_TOKEN ?? '';
@@ -10,8 +28,8 @@ function App() {
   }, []);
 
   const handleAvatarExported = (data: AvatarExportedData) => {
-    alert(`Avatar Exported! URL: ${data.url}`);
     console.log('Exported Avatar Data:', data);
+    setExportedData(data);
   };
 
   return (
@@ -109,19 +127,174 @@ function App() {
           </div>
         </div>
       ) : (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <AvatarCreator
-            token={token}
-            config={{
-              bodyType: 'Full',
-              whiteLabelTitle: 'Sandbox Test',
-              whiteLabelColor: 'BB86FC',
-              thumbnail: true,
-            }}
-            onReady={() => console.log('Streamoji iframe ready')}
-            onAvatarExported={handleAvatarExported}
-            style={{ width: '100%', flex: 1, border: 'none' }}
-          />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          {exportedData ? (
+            <div style={{ 
+              flex: 1, 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              padding: '40px',
+              gap: '30px',
+              overflowY: 'auto',
+              background: 'linear-gradient(135deg, #fcfaff 0%, #f0e6ff 100%)'
+            }}>
+              <div style={{ 
+                display: 'flex', 
+                gap: '40px', 
+                width: '100%', 
+                maxWidth: '1000px',
+                justifyContent: 'center',
+                flexWrap: 'wrap'
+              }}>
+                {/* 3D Viewer Card */}
+                <div style={{ 
+                  flex: '1 1 400px',
+                  background: 'white',
+                  borderRadius: '24px',
+                  padding: '20px',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '15px'
+                }}>
+                  <h3 style={{ margin: 0, color: '#4a3a63', fontSize: '18px' }}>3D Avatar Model</h3>
+                  <div style={{ 
+                    width: '100%', 
+                    height: '400px', 
+                    background: '#f8f9fa', 
+                    borderRadius: '16px',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}>
+                    <model-viewer
+                      src={exportedData.url}
+                      camera-controls
+                      auto-rotate
+                      shadow-intensity="1"
+                      environment-image="neutral"
+                      style={{ width: '100%', height: '100%' }}
+                    />
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#888', wordBreak: 'break-all', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <strong>Model URL:</strong>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <a href={exportedData.url} target="_blank" rel="noreferrer" style={{ color: '#BB86FC', flex: 1, textDecoration: 'none', background: '#f0f0f0', padding: '4px 8px', borderRadius: '4px' }}>
+                        {exportedData.url.substring(0, 50)}...
+                      </a>
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(exportedData.url);
+                          alert('Copied to clipboard!');
+                        }}
+                        style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ddd', cursor: 'pointer', background: 'white', fontSize: '10px' }}
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Thumbnail Card */}
+                {exportedData.thumbnailUrl && (
+                  <div style={{ 
+                    flex: '0 0 300px',
+                    background: 'white',
+                    borderRadius: '24px',
+                    padding: '20px',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '15px'
+                  }}>
+                    <h3 style={{ margin: 0, color: '#4a3a63', fontSize: '18px' }}>Avatar Thumbnail</h3>
+                    <div style={{ 
+                      width: '100%', 
+                      aspectRatio: '1', 
+                      background: '#f8f9fa', 
+                      borderRadius: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden'
+                    }}>
+                      <img 
+                        src={exportedData.thumbnailUrl} 
+                        alt="Avatar Thumbnail" 
+                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                      />
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#888', wordBreak: 'break-all', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                      <strong>Thumbnail URL:</strong>
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <a href={exportedData.thumbnailUrl} target="_blank" rel="noreferrer" style={{ color: '#BB86FC', flex: 1, textDecoration: 'none', background: '#f0f0f0', padding: '4px 8px', borderRadius: '4px' }}>
+                          {exportedData.thumbnailUrl.substring(0, 40)}...
+                        </a>
+                        <button 
+                          onClick={() => {
+                            if (exportedData.thumbnailUrl) {
+                              navigator.clipboard.writeText(exportedData.thumbnailUrl);
+                              alert('Copied to clipboard!');
+                            }
+                          }}
+                          style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ddd', cursor: 'pointer', background: 'white', fontSize: '10px' }}
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', gap: '15px' }}>
+                <button 
+                  onClick={() => setExportedData(null)}
+                  style={{ 
+                    padding: '12px 30px', 
+                    borderRadius: '12px', 
+                    background: '#BB86FC', 
+                    color: '#4a3a63', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    fontWeight: 'bold',
+                    fontSize: '16px',
+                    boxShadow: '0 8px 20px rgba(187, 134, 252, 0.3)'
+                  }}
+                >
+                  Edit Again
+                </button>
+                <button 
+                  onClick={() => window.location.reload()}
+                  style={{ 
+                    padding: '12px 30px', 
+                    borderRadius: '12px', 
+                    background: 'white', 
+                    color: '#4a3a63', 
+                    border: '1px solid #ddd', 
+                    cursor: 'pointer', 
+                    fontWeight: 'bold',
+                    fontSize: '16px'
+                  }}
+                >
+                  New Session
+                </button>
+              </div>
+            </div>
+          ) : (
+            <AvatarCreator
+              token={token}
+              config={{
+                bodyType: 'Full',
+                whiteLabelTitle: 'Sandbox Test',
+                whiteLabelColor: 'BB86FC',
+                thumbnail: true,
+              }}
+              onReady={() => console.log('Streamoji iframe ready')}
+              onAvatarExported={handleAvatarExported}
+              style={{ width: '100%', flex: 1, border: 'none' }}
+            />
+          )}
         </div>
       )}
     </div>
