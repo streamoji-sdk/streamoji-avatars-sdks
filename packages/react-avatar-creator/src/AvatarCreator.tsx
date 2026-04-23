@@ -61,7 +61,15 @@ export const AvatarCreator: React.FC<AvatarCreatorProps> = ({
   }, [onAvatarExported, config]);
 
   const baseUrl = 'https://avatars.streamoji.com/createAvatar/';
-  const url = `${baseUrl}?token=${token}&iframe=true`;
+  let url = `${baseUrl}?token=${token}&iframe=true`;
+
+  if (config) {
+    if (config.bodyType) url += `&bodyType=${config.bodyType}`;
+    if (config.saveConfirm !== undefined) url += `&saveConfirm=${config.saveConfirm}`;
+    if (config.thumbnail) url += '&thumbnail=true';
+    if (config.whiteLabelTitle) url += `&whiteLabelTitle=${encodeURIComponent(config.whiteLabelTitle)}`;
+    if (config.whiteLabelColor) url += `&whiteLabelColor=${encodeURIComponent(config.whiteLabelColor.replace('#', ''))}`;
+  }
 
   const defaultStyle: React.CSSProperties = {
     width: '100%',

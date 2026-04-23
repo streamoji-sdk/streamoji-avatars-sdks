@@ -5,6 +5,7 @@ export interface AvatarCreatorConfig {
   whiteLabelTitle?: string;
   whiteLabelColor?: string;
   thumbnail?: boolean;
+  saveConfirm?: boolean;
 }
 
 export interface AvatarExportedData {
