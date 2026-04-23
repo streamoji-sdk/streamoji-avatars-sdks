@@ -193,42 +193,12 @@ function App() {
                       </button>
                     </div>
                   </div>
-                </div>
-
-                {/* Thumbnail Card */}
-                {exportedData.thumbnailUrl && (
-                  <div style={{ 
-                    flex: '0 0 300px',
-                    background: 'white',
-                    borderRadius: '24px',
-                    padding: '20px',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '15px'
-                  }}>
-                    <h3 style={{ margin: 0, color: '#4a3a63', fontSize: '18px' }}>Avatar Thumbnail</h3>
-                    <div style={{ 
-                      width: '100%', 
-                      aspectRatio: '1', 
-                      background: '#f8f9fa', 
-                      borderRadius: '16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      overflow: 'hidden'
-                    }}>
-                      <img 
-                        src={exportedData.thumbnailUrl} 
-                        alt="Avatar Thumbnail" 
-                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                      />
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#888', wordBreak: 'break-all', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  {exportedData.thumbnailUrl && (
+                    <div style={{ fontSize: '12px', color: '#888', wordBreak: 'break-all', display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '5px' }}>
                       <strong>Thumbnail URL:</strong>
                       <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                         <a href={exportedData.thumbnailUrl} target="_blank" rel="noreferrer" style={{ color: '#BB86FC', flex: 1, textDecoration: 'none', background: '#f0f0f0', padding: '4px 8px', borderRadius: '4px' }}>
-                          {exportedData.thumbnailUrl.substring(0, 40)}...
+                          {exportedData.thumbnailUrl.substring(0, 50)}...
                         </a>
                         <button 
                           onClick={() => {
@@ -243,8 +213,10 @@ function App() {
                         </button>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+
+
               </div>
 
               <div style={{ display: 'flex', gap: '15px' }}>
