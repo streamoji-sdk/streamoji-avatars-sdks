@@ -1,11 +1,9 @@
 # Dependencies
 node_modules/
-react-sdk/node_modules/
 test-app/node_modules/
 
 # Build output
 dist/
-react-sdk/dist/
 test-app/dist/
 *.tsbuildinfo
 node_modules/.tmp/
