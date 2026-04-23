@@ -8,6 +8,13 @@ declare global {
       'model-viewer': any;
     }
   }
+  namespace React {
+    namespace JSX {
+      interface IntrinsicElements {
+        'model-viewer': any;
+      }
+    }
+  }
 }
 
 
